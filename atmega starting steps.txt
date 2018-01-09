@@ -1,0 +1,12 @@
+avrdude -c atmelice_isp -p m8 -U lfuse:w:0xFF:m -U hfuse:w:0xD9:m // step 1 setting clock for external cystal (for brand new chips)
+
+avr-gcc -g -Os -mmcu=atmega8 -c file.c // step2 (compile)
+avr-gcc -g -mmcu=atmega8 -o file.elf file.o // step3 (compile)
+avr-objcopy -j .text -j .data -O ihex file.elf file.hex //step4 (compile)
+
+avrdude -c atmelice_isp -p m8 -U flash:w:file.hex //Upload program
+
+LOGIC STUFFF
+
+borris@borris-ThinkPad-X1-Carbon-3rd:~/Logic 1.2.17 (64-bit)$ sudo ./Logic
+
