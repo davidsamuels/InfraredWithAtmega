@@ -61,6 +61,14 @@ uint8_t TWIReadACK(void)
 	return TWDR;
 }
 
+//read byte then send NACK
+uint8_t TWIReadNACK(void)
+{
+	TWCR = (1<<TWINT)|(1<<TWEN);
+	while ((TWCR & (1<<TWINT)) == 0);
+	return TWDR;
+}
+
 uint8_t TWIGetStatus(void)
 {
 	uint8_t status;
@@ -69,35 +77,64 @@ uint8_t TWIGetStatus(void)
 	return status;
 }
 
-uint8_t ReadDistance(uint8_t address){
-	uint8_t distance;
+uint8_t StartInfraredSensor(uint8_t address) {
 	
-	DDRD |= (1 << DDD7);
-	
-	
-	TWIStart();
+	TWIStart(); // 
 	
 	TWIWrite(address);
-
 	
 	TWIWrite(0x00);
 	
-	TWIWrite(0x19); // 
+	TWIWrite(0x18); // 
 
 	TWIWrite(0x03);
+
+	TWIStop();
+}
+
+uint8_t ReadDistance(uint8_t address){
+	uint8_t distance;
+
+	TWIStart();
 	
+	DDRD |= (1 << DDD7); // turns on led output
+
+	TWIWrite(address);
+
+	TWIWrite(0x00);        
+
+	TWIWrite(0x4F);
+
+	
+	//address |= 0x01;
+
+	TWIWrite(0x53);
+
+	distance = TWIReadNACK();
+
 	TWIWrite(address);
 
 	TWIWrite(0x00);        
 
 	TWIWrite(0x62);
 
-	address |= 0x01;
+	
+	//address |= 0x01;
+
+	TWIWrite(0x53);
+
+	distance = TWIReadNACK();
 
 	TWIWrite(address);
-
-	distance = TWIReadACK();
 	
+	TWIWrite(0x00);        
+
+	TWIWrite(0x15);
+
+	TWIWrite(0x01);
+
+	//TWIStop();	
+
 	return distance; 
 
 }
@@ -112,12 +149,14 @@ int main(void) {
 
 	TWI_Init();	
 
+	StartInfraredSensor(address);
+
 	while(1){
 		
 		USART_Transmit(message >> 8);
 		USART_Transmit(message);
-		USART_Transmit(distance);
-
+		USART_Transmit(distance);		
+		
 		distance = ReadDistance(address);
 		
 		PORTD ^= (1<<PD7);
