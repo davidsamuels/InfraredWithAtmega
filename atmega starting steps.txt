@@ -8,5 +8,6 @@ avrdude -c atmelice_isp -p m8 -U flash:w:file.hex //Upload program
 
 LOGIC STUFFF
 
-borris@borris-ThinkPad-X1-Carbon-3rd:~/Logic 1.2.17 (64-bit)$ sudo ./Logic
+borris@borris-ThinkPad-X1-Carbon-3rd:~/Logic 1.2.17 (64-bit)
+$ sudo ./Logic
 
